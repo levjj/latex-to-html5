@@ -8,7 +8,7 @@ OUTPUT_FOLDER="$2"
 HTML_SETTINGS="$SCRIPT_DIR/html-plain,fn-in,charset=utf-8" 
 ENCODING="-cunihtf -utf8"
 
-
+mkdir -p $OUTPUT_FOLDER
 pdflatex $MAIN_FILE
 bibtex   $MAIN_FILE
 pdflatex $MAIN_FILE
@@ -21,5 +21,26 @@ latex $5 '\makeatletter\def\HCode{\futurelet\HCode\HChar}\def\HChar{\ifx"\HCode\
 tex4ht -f/$MAIN_FILE  -i~/tex4ht.dir/texmf/tex4ht/ht-fonts/ $ENCODING
 t4ht -f/$MAIN_FILE -d$OUTPUT_FOLDER
 
-tidy -ashtml -utf8 $MAIN_FILE.html > $MAIN_FILE-tidy.html
-$SCRIPT_DIR/post-process-html.py $MAIN_FILE-tidy.html > $MAIN_FILE-final.html
+echo Process $OUTPUT_FOLDER/$MAIN_FILE.html to $OUTPUT_FOLDER/$MAIN_FILE-final.html
+$SCRIPT_DIR/post-process-html.py $OUTPUT_FOLDER/$MAIN_FILE.html > $OUTPUT_FOLDER/$MAIN_FILE-final.html && mv $OUTPUT_FOLDER/$MAIN_FILE-final.html $OUTPUT_FOLDER/$MAIN_FILE.html
+
+echo Writing to $OUTPUT_FOLDER/$MAIN_FILE.css
+cp $SCRIPT_DIR/lora.ttf $OUTPUT_FOLDER
+cat << HERE >> $OUTPUT_FOLDER/$MAIN_FILE.css
+@font-face {
+  font-family: 'Lora';
+  src: url('lora.ttf')  format('truetype');
+}
+article {
+  width: 600px;
+  margin: auto;
+  text-align: justify;
+ 	font-family: 'Lora', 'URW Palladio L', 'Palatino Linotype',Cambria,'Book Antiqua', serif;
+}
+img {
+  max-width: 600px;
+}
+.sidenote { position: absolute; right: 0; right: 1em; max-width: 25vw; }
+.linenumbers { display: none; }
+.copyrightetc { display: none; }
+HERE

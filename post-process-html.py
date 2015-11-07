@@ -18,6 +18,10 @@ def combine_citation_links(soup):
             # within a list, use normal spaces to avoid typesetting issues
             e.previous_sibling.replace_with(", ")
 
+        # also ignore empty contents
+        if e.contents[0].isnumeric is None:
+            continue
+
         # also ignore just year links, we might just have fixed the space before
         if e.contents[0].isnumeric():
             continue
@@ -130,6 +134,8 @@ def remove_superfluous_id_after_footnote(soup):
 def transform_header(soap):
     head = soup.find("div", {"class" : "maketitle"})
     if not head:
+        return
+    if head.contents[1].name != "h2":
         return
     assert head.contents[1].name == "h2"
     assert head.contents[3].name == "div"
